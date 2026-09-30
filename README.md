@@ -26,7 +26,7 @@ Shortlist → Contact → Interview → Trial → Hire
 
 1. Install dependencies: `npm install`
 2. Optional: copy `.env.example` to `.env.local` and set `GEMINI_API_KEY` for a later narrative integration. Match scores run locally and do not need the key.
-3. Start the app: `npm run dev`
+3. Start the app: `npm run dev`. Discover loads ChefFinder Search, Programmable Search Engine `f5cf19bdcf6e04bc5`.
 4. Optional API: `npm run server` (proxied from Vite at `/api`)
 
 ## Checks

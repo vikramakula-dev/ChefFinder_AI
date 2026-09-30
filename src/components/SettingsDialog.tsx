@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { GOOGLE_CSE_ID, GOOGLE_CSE_URL } from '../config';
 
 interface SettingsDialogProps {
   onClose: () => void;
@@ -46,9 +47,12 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
           </p>
         </section>
         <section>
-          <h3>Public discovery</h3>
+          <h3>ChefFinder Search</h3>
           <p>
-            Web, referral, and job-board imports stay labelled as potential candidates until that chef submits an application.
+            Programmable Search Engine <code>{GOOGLE_CSE_ID}</code>. Web results are potential discovery pages.
+          </p>
+          <p className="fine">
+            <a href={GOOGLE_CSE_URL}>Public search page</a>
           </p>
         </section>
       </div>

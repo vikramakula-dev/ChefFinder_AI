@@ -5,6 +5,7 @@ import { CandidateModal } from './components/CandidateModal';
 import { DashboardStats } from './components/DashboardStats';
 import { Navbar } from './components/Navbar';
 import { PipelineBoard } from './components/PipelineBoard';
+import { ProgrammableSearch } from './components/ProgrammableSearch';
 import { SearchFiltersSection } from './components/SearchFiltersSection';
 import { SearchLoadingAnimation } from './components/SearchLoadingAnimation';
 import { SettingsDialog } from './components/SettingsDialog';
@@ -206,6 +207,7 @@ export default function App() {
 
         {view === 'discover' && (
           <>
+            <ProgrammableSearch />
             <SearchFiltersSection
               filters={filters}
               roles={roleOptions}
