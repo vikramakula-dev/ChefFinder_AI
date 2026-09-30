@@ -2,8 +2,9 @@ import { seedChefs } from '../data/chefs';
 import type { ChefCandidate } from '../types';
 
 /**
- * Stand-in for public web and job-board discovery.
- * Every row is a potential record. Submitting a chef application is what structures the profile.
+ * Filters the in-app roster (seeded discovery rows and submitted applications).
+ * Live web discovery is the ChefFinder Programmable Search element, not this function.
+ * Every seeded row stays a potential record until a chef application is submitted.
  */
 export function matchesDiscoveryQuery(candidate: ChefCandidate, query: string): boolean {
   const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);

@@ -6,7 +6,8 @@ V1 does not verify phone numbers. A phone number is a contact field only. Candid
 
 | Record | How it is created | Label |
 | --- | --- | --- |
-| Public social, web, or job-board row | Discovery search | Potential · Discovery or Potential · Job board |
+| Public web page | ChefFinder Search (`f5cf19bdcf6e04bc5`) | Potential discovery page in the Programmable Search results |
+| Seeded social, referral, or job-board row | Roster | Potential · Discovery, Referral, or Job board |
 | Referral note | Discovery search | Potential · Referral |
 | Chef application | Applications screen | Application-ready structured candidate |
 | Restaurant requirement | Applications screen | Structured matching target |
@@ -31,6 +32,14 @@ With no restaurant requirement selected, the UI shows a preview score from profi
 ## Pipeline
 
 From a candidate profile, a recruiter can invite a potential chef to apply, shortlist them, then move the record through contact, interview, trial, and hire. An invite copies contact fields into the application form. Submitting that form creates the structured candidate and, when the invite came from a discovery record, replaces that discovery row.
+
+## Static site
+
+`docs/index.html` is the GitHub Pages site. It follows this policy: phone numbers are contact fields, web search hits stay potential pages, and submitted applications become structured candidates.
+
+## ChefFinder Search
+
+The Discover screen embeds Google Programmable Search Engine `f5cf19bdcf6e04bc5` (public page: https://cse.google.com/cse?cx=f5cf19bdcf6e04bc5). The engine is configured to search the web. Those hits stay outside the structured roster. Roster filters and match scores apply to seeded records and submitted applications.
 
 ## Storage
 

@@ -137,6 +137,9 @@ main { width: min(1120px, calc(100% - 2rem)); margin: 0 auto; padding: 1.5rem 0 
 .stat strong { font-family: var(--serif); font-size: 1.8rem; }
 
 .filters, .panel { padding: 1rem; }
+.gcse-panel { margin-bottom: 0.9rem; }
+.gcse-search { min-height: 3.5rem; }
+.gcse-search .gsc-control-cse { padding: 0; background: transparent; border: 0; }
 .filters-head { margin-bottom: 0.8rem; }
 .filters-head p, .fine, .summary, .card-role { color: var(--muted); }
 .filters-grid, .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }

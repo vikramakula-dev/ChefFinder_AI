@@ -1,7 +1,7 @@
 const STEPS = [
-  'Reading public discovery sources',
-  'Keeping those rows labelled as potential records',
-  'Preparing application-readiness scoring',
+  'Filtering chefs already in the roster',
+  'Keeping discovery rows labelled as potential records',
+  'Scoring application readiness',
 ];
 
 export function SearchLoadingAnimation() {
@@ -9,7 +9,7 @@ export function SearchLoadingAnimation() {
     <div className="loading" role="status" data-testid="search-loading">
       <div className="loading-mark" aria-hidden="true" />
       <div>
-        <strong>Structuring the search</strong>
+        <strong>Updating the roster</strong>
         <ul>
           {STEPS.map((step) => (
             <li key={step}>{step}</li>

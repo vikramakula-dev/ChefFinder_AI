@@ -24,14 +24,14 @@ export function SearchFiltersSection({
   return (
     <form className="filters" onSubmit={submit}>
       <div className="filters-head">
-        <h2>Discovery search</h2>
+        <h2>Roster filters</h2>
         <p>
-          Public social and job-board rows stay labelled as potential records. Structured facts arrive when a chef or restaurant submits an application.
+          These filters apply to chefs already in ChefFinder. Web hits stay in ChefFinder Search until someone submits an application.
         </p>
       </div>
       <div className="filters-grid">
         <label>
-          Search
+          Filter roster
           <input
             value={filters.query}
             onChange={(event) => onChange({ ...filters, query: event.target.value })}
@@ -81,7 +81,7 @@ export function SearchFiltersSection({
           Application-ready only
         </label>
         <button type="submit" className="button" data-testid="search-button">
-          Search discovery sources
+          Filter roster
         </button>
       </div>
     </form>
