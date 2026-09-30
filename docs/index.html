@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChefFinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,680&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4efe6; --ink: #1d1915; --muted: #6e6257; --line: #e3d6c4; --card: #fffdf9;
+      --copper: #9a3412; --sage: #1f6b4a; --sage-soft: #e7f4ec; --gold-soft: #f8ead8;
+      --danger: #9f1239; --shadow: 0 16px 40px rgba(62, 38, 14, 0.08);
+      --serif: "Fraunces", Georgia, serif; --sans: "Outfit", "Segoe UI", sans-serif;
+      color: var(--ink); background: var(--bg); font-family: var(--sans); line-height: 1.45;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top left, rgba(154, 52, 18, 0.08), transparent 32rem), var(--bg); }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 560; letter-spacing: -0.03em; margin: 0; }
+    p { margin: 0; }
+    [hidden] { display: none !important; }
+    .nav { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.5rem; border-bottom: 1px solid var(--line); background: rgba(255, 253, 249, 0.9); position: sticky; top: 0; z-index: 5; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; min-width: 12rem; }
+    .brand strong { display: block; font-size: 1.05rem; }
+    .brand em { display: block; font-style: normal; color: var(--muted); font-size: 0.82rem; }
+    .brand-mark { width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 0.8rem; background: var(--ink); color: #f8efe4; font-family: var(--serif); }
+    .nav-links { display: flex; gap: 0.4rem; flex: 1; }
+    .nav-link, .button, .icon-button { border: 1px solid transparent; border-radius: 999px; background: transparent; }
+    .nav-link { padding: 0.45rem 0.85rem; color: var(--muted); }
+    .nav-link.active { background: var(--ink); color: #f8efe4; }
+    .button { padding: 0.55rem 0.95rem; background: var(--copper); color: white; border-color: var(--copper); }
+    .button.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    .button:disabled { opacity: 0.55; cursor: default; }
+    .icon-button { width: 2.2rem; height: 2.2rem; border-color: var(--line); background: white; font-size: 1.3rem; }
+    main { width: min(1120px, calc(100% - 2rem)); margin: 0 auto; padding: 1.5rem 0 3rem; }
+    .hero { max-width: 42rem; margin-bottom: 1.25rem; }
+    .hero h1 { font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 1.02; margin: 0.3rem 0 0.7rem; }
+    .hero p, .filters-head p, .fine, .summary, .card-role { color: var(--muted); }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem; color: var(--copper); font-weight: 600; }
+    .target { margin-top: 0.8rem; display: inline-block; background: var(--gold-soft); border-radius: 999px; padding: 0.35rem 0.75rem; color: var(--ink); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin: 1.25rem 0; }
+    .stat, .card, .panel, .filters, .loading, .column { background: var(--card); border: 1px solid var(--line); border-radius: 1.1rem; box-shadow: var(--shadow); }
+    .stat, .filters, .panel { padding: 1rem; }
+    .stat span { display: block; color: var(--muted); font-size: 0.85rem; }
+    .stat strong { font-family: var(--serif); font-size: 1.8rem; }
+    .gcse-panel { margin-bottom: 0.9rem; }
+    .filters-head { margin-bottom: 0.8rem; }
+    .filters-grid, .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+    label { display: grid; gap: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+    input, select, textarea { width: 100%; border: 1px solid var(--line); background: #fff; border-radius: 0.75rem; padding: 0.6rem 0.7rem; }
+    .filters-actions, .card-actions, .dialog-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 0.9rem; }
+    .check { display: flex; align-items: center; gap: 0.45rem; }
+    .check input { width: auto; }
+    .loading { display: flex; gap: 1rem; align-items: center; padding: 1rem 1.1rem; margin-top: 1rem; }
+    .loading-mark { width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 3px solid var(--gold-soft); border-top-color: var(--copper); animation: spin 0.8s linear infinite; }
+    .loading ul { margin: 0.35rem 0 0; padding-left: 1.1rem; color: var(--muted); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; margin-top: 1rem; }
+    .card, .column-card { padding: 1rem; }
+    .column-card { box-shadow: none; border: 1px solid var(--line); border-radius: 0.9rem; background: #fff; }
+    .card-top, .dialog-head, .column header { display: flex; justify-content: space-between; gap: 1rem; }
+    .score { text-align: right; }
+    .score strong, .score-line { font-family: var(--serif); font-size: 1.8rem; color: var(--sage); }
+    .score span { display: block; color: var(--muted); font-size: 0.75rem; }
+    .summary { margin: 0.7rem 0; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 0.4rem 0 0; list-style: none; }
+    .chips li { background: var(--gold-soft); border-radius: 999px; padding: 0.2rem 0.55rem; font-size: 0.82rem; }
+    .empty { margin-top: 1rem; color: var(--muted); }
+    .applications { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .stack-form { display: grid; gap: 0.75rem; }
+    .form-error { color: var(--danger); }
+    .form-ok { color: var(--sage); background: var(--sage-soft); border-radius: 0.7rem; padding: 0.55rem 0.7rem; }
+    .record-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.55rem; }
+    .record-list li { display: grid; gap: 0.15rem; padding-top: 0.55rem; border-top: 1px solid var(--line); }
+    .board { display: grid; grid-template-columns: repeat(5, minmax(10rem, 1fr)); gap: 0.7rem; overflow-x: auto; }
+    .column { padding: 0.75rem; min-height: 16rem; }
+    .column header { align-items: baseline; margin-bottom: 0.6rem; }
+    .column header span { color: var(--muted); }
+    .column-card + .column-card { margin-top: 0.6rem; }
+    .backdrop { position: fixed; inset: 0; background: rgba(29, 25, 21, 0.42); display: grid; place-items: center; padding: 1rem; z-index: 20; }
+    .dialog { width: min(640px, 100%); max-height: min(88vh, 860px); overflow: auto; background: var(--card); border-radius: 1.2rem; padding: 1.1rem 1.2rem 1.3rem; box-shadow: var(--shadow); }
+    .dialog section { margin-top: 1rem; }
+    .dialog h3 { font-size: 1.15rem; margin-bottom: 0.35rem; }
+    .factors { list-style: none; padding: 0; margin: 0.4rem 0 0; }
+    .factors li { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid var(--line); }
+    code { font-size: 0.85em; background: var(--gold-soft); padding: 0.1rem 0.3rem; border-radius: 0.3rem; }
+    @media (max-width: 980px) {
+      .stats, .filters-grid, .applications, .card-grid { grid-template-columns: 1fr 1fr; }
+      .board { grid-template-columns: repeat(5, 14rem); }
+    }
+    @media (max-width: 720px) {
+      .nav { flex-wrap: wrap; }
+      .stats, .filters-grid, .form-grid, .applications, .card-grid { grid-template-columns: 1fr; }
+      .filters-actions, .card-actions, .dialog-actions { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">CF</span>
+      <div>
+        <strong>ChefFinder</strong>
+        <em>Application-first hiring</em>
+      </div>
+    </div>
+    <nav class="nav-links" aria-label="Primary">
+      <button type="button" class="nav-link active" data-view="discover">Discover</button>
+      <button type="button" class="nav-link" data-view="applications">Applications</button>
+      <button type="button" class="nav-link" data-view="pipeline">Pipeline</button>
+    </nav>
+    <button type="button" class="button ghost" id="open-settings">Settings</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">V1 · Application first</p>
+      <h1>Hire chefs from submitted applications.</h1>
+      <p>Discovery records stay potential until a chef applies. A restaurant requirement becomes the matching target, and the score uses role, cuisine, location, experience, skills, and application readiness.</p>
+      <p class="target" id="active-target" hidden></p>
+    </section>
+    <section class="stats" id="stats" aria-label="Hiring snapshot"></section>
+
+    <section id="view-discover">
+      <section class="filters gcse-panel" aria-label="ChefFinder Search">
+        <div class="filters-head">
+          <h2>ChefFinder Search</h2>
+          <p>Web results from Programmable Search Engine <code>f5cf19bdcf6e04bc5</code> are potential discovery pages. A chef becomes a structured candidate after they submit an application.</p>
+        </div>
+        <div class="gcse-search"></div>
+      </section>
+      <form class="filters" id="roster-form">
+        <div class="filters-head">
+          <h2>Roster filters</h2>
+          <p>These filters apply to chefs already in this page. Web hits stay in ChefFinder Search until someone submits an application.</p>
+        </div>
+        <div class="filters-grid">
+          <label>Filter roster <input id="filter-query" placeholder="Name, cuisine, city, skill" /></label>
+          <label>Role <select id="filter-role"><option value="all">All roles</option></select></label>
+          <label>Cuisine <select id="filter-cuisine"><option value="all">All cuisines</option></select></label>
+          <label>Location contains <input id="filter-location" placeholder="Hyderabad" /></label>
+        </div>
+        <div class="filters-actions">
+          <label class="check"><input type="checkbox" id="filter-ready" /> Application-ready only</label>
+          <button type="submit" class="button">Filter roster</button>
+        </div>
+      </form>
+      <div id="roster-status"></div>
+      <section class="card-grid" id="roster" aria-label="Candidates"></section>
+    </section>
+
+    <section id="view-applications" hidden>
+      <div class="applications">
+        <section class="panel">
+          <div class="filters-head">
+            <h2>Chef application</h2>
+            <p>Submitting this form creates a structured candidate. The phone field is contact information.</p>
+          </div>
+          <form class="stack-form" id="chef-form">
+            <input type="hidden" id="chef-source" />
+            <div class="form-grid">
+              <label>Full name <input id="chef-name" required /></label>
+              <label>Contact phone <input id="chef-phone" placeholder="Optional" /></label>
+              <label>Email <input id="chef-email" /></label>
+              <label>Location <input id="chef-location" required /></label>
+              <label>Role <input id="chef-role" required /></label>
+              <label>Years of experience <input id="chef-years" type="number" min="0" required /></label>
+              <label>Cuisines <input id="chef-cuisine" placeholder="Hyderabadi, North Indian" /></label>
+              <label>Skills <input id="chef-skills" placeholder="Costing, Tandoor" /></label>
+              <label>Availability <input id="chef-availability" /></label>
+              <label>Salary expectation <input id="chef-salary" /></label>
+            </div>
+            <label>Application summary <textarea id="chef-summary" rows="3"></textarea></label>
+            <p class="form-error" id="chef-error" hidden></p>
+            <p class="form-ok" id="chef-message" hidden></p>
+            <button type="submit" class="button">Submit chef application</button>
+          </form>
+          <ul class="record-list" id="application-list"></ul>
+        </section>
+        <section class="panel">
+          <div class="filters-head">
+            <h2>Restaurant requirement</h2>
+            <p>Submitting this form creates the structured target used for matching.</p>
+          </div>
+          <form class="stack-form" id="job-form">
+            <div class="form-grid">
+              <label>Restaurant <input id="job-name" required /></label>
+              <label>Contact name <input id="job-contact" /></label>
+              <label>Contact phone <input id="job-phone" placeholder="Optional" /></label>
+              <label>Email <input id="job-email" /></label>
+              <label>Location <input id="job-location" required /></label>
+              <label>Role <input id="job-role" required /></label>
+              <label>Cuisines <input id="job-cuisine" placeholder="Hyderabadi" /></label>
+              <label>Minimum experience <input id="job-years" type="number" min="0" required /></label>
+              <label>Required skills <input id="job-skills" placeholder="Costing" /></label>
+              <label>Employment type
+                <select id="job-type">
+                  <option>Full-time</option><option>Part-time</option><option>Contract</option><option>Trial</option>
+                </select>
+              </label>
+              <label>Salary range <input id="job-salary" /></label>
+            </div>
+            <label>Notes <textarea id="job-notes" rows="3"></textarea></label>
+            <p class="form-error" id="job-error" hidden></p>
+            <p class="form-ok" id="job-message" hidden></p>
+            <button type="submit" class="button">Save requirement</button>
+          </form>
+          <ul class="record-list" id="requirement-list"></ul>
+        </section>
+      </div>
+    </section>
+
+    <section id="view-pipeline" hidden>
+      <div class="board" id="pipeline" aria-label="Hiring pipeline"></div>
+    </section>
+  </main>
+
+  <div class="backdrop" id="modal" hidden></div>
+  <div class="backdrop" id="settings" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <header class="dialog-head">
+        <div>
+          <p class="eyebrow">Workspace</p>
+          <h2 id="settings-title">Settings</h2>
+        </div>
+        <button type="button" class="icon-button" data-close="settings" aria-label="Close settings">×</button>
+      </header>
+      <section>
+        <h3>Browser storage</h3>
+        <p>Chef applications live in <code>cheffinder_chef_applications</code>. Restaurant requirements live in <code>cheffinder_job_requirements</code>.</p>
+      </section>
+      <section>
+        <h3>ChefFinder Search</h3>
+        <p>Programmable Search Engine <code>f5cf19bdcf6e04bc5</code>. Web results are potential discovery pages.</p>
+        <p class="fine"><a href="https://cse.google.com/cse?cx=f5cf19bdcf6e04bc5">Public search page</a></p>
+      </section>
+    </div>
+  </div>
+
+  <script async src="https://cse.google.com/cse.js?cx=f5cf19bdcf6e04bc5"></script>
+  <script>
+    const APPS_KEY = 'cheffinder_chef_applications';
+    const JOBS_KEY = 'cheffinder_job_requirements';
+    const PIPELINE = ['shortlisted', 'contacted', 'interview', 'trial', 'hired'];
+    const SEED = [
+      { id: 'disc-ayesha', name: 'Ayesha Rahman', role: 'Head Chef', cuisine: ['Hyderabadi', 'North Indian'], location: 'Hyderabad', experienceYears: 12, phone: '+91 98480 11021', email: 'ayesha.rahman@example.com', source: 'discovery', status: 'potential', applicationReady: false, summary: 'Public hotel profile describing biryani service, brigade leadership, and menu work in Hyderabad.', skills: ['Menu development', 'Brigade leadership', 'Costing'] },
+      { id: 'disc-vikram', name: 'Vikram Desai', role: 'Sous Chef', cuisine: ['North Indian', 'Continental'], location: 'Mumbai', experienceYears: 8, phone: '+91 98200 44118', email: 'vikram.desai@example.com', source: 'job_board', status: 'potential', applicationReady: false, summary: 'Job-board résumé listing banquet volume, grill station, and a sous role at a city hotel.', skills: ['Grill', 'Banquet service', 'Inventory'] },
+      { id: 'disc-meera', name: 'Meera Iyer', role: 'Pastry Chef', cuisine: ['Bakery', 'Continental'], location: 'Bengaluru', experienceYears: 9, email: 'meera.iyer@example.com', source: 'discovery', status: 'potential', applicationReady: false, summary: 'Portfolio site with plated dessert work and café pastry production in Bengaluru.', skills: ['Plated dessert', 'Bread', 'Recipe costing'] },
+      { id: 'disc-farhan', name: 'Farhan Qureshi', role: 'Tandoor Chef', cuisine: ['North Indian', 'Mughlai'], location: 'Hyderabad', experienceYears: 15, phone: '+91 90000 22881', source: 'referral', status: 'potential', applicationReady: false, summary: 'Referred by a hotel chef. Notes mention tandoor section lead and wedding volume.', skills: ['Tandoor', 'Kebabs', 'Section lead'] },
+      { id: 'disc-lena', name: 'Lena Costa', role: 'Chef de Partie', cuisine: ['Italian', 'Continental'], location: 'Dubai', experienceYears: 6, phone: '+971 50 441 2290', email: 'lena.costa@example.com', source: 'job_board', status: 'potential', applicationReady: false, summary: 'Job-board listing for an Italian hot line in Dubai, with pasta and sauce station experience.', skills: ['Pasta', 'Sauce station', 'Allergies'] },
+      { id: 'disc-arjun', name: 'Arjun Nair', role: 'Executive Chef', cuisine: ['South Indian', 'Continental'], location: 'Bengaluru', experienceYears: 18, phone: '+91 98860 77210', source: 'discovery', status: 'potential', applicationReady: false, summary: 'Conference bio covering multi-outlet kitchen leadership and South Indian tasting menus.', skills: ['Multi-site', 'P&L', 'Menu development'] },
+      { id: 'disc-hana', name: 'Hana Suzuki', role: 'Sous Chef', cuisine: ['Japanese'], location: 'London', experienceYears: 11, email: 'hana.suzuki@example.com', source: 'referral', status: 'potential', applicationReady: false, summary: 'Referral note from a London omakase counter. Sushi and broth work are mentioned.', skills: ['Sushi', 'Broth', 'Counter service'] },
+      { id: 'disc-ravi', name: 'Ravi Patel', role: 'Commis Chef', cuisine: ['North Indian', 'Chinese'], location: 'Ahmedabad', experienceYears: 2, phone: '+91 98765 33012', source: 'job_board', status: 'potential', applicationReady: false, summary: 'Junior job-board profile with commis shifts on an Indian-Chinese line.', skills: ['Prep', 'Wok', 'Hygiene'] },
+      { id: 'disc-sofia', name: 'Sofia Almeida', role: 'Head Chef', cuisine: ['Italian', 'Bakery'], location: 'Hyderabad', experienceYears: 10, phone: '+91 91234 88001', email: 'sofia.almeida@example.com', source: 'discovery', status: 'potential', applicationReady: false, summary: 'Public article about an Italian trattoria kitchen in Hyderabad and in-house bread.', skills: ['Italian menu', 'Bread', 'Team training'] }
+    ];
+
+    const state = {
+      view: 'discover',
+      applications: load(APPS_KEY),
+      requirements: load(JOBS_KEY),
+      activeRequirementId: null,
+      pipeline: {},
+      query: '',
+      searching: false,
+      selectedId: null
+    };
+
+    function load(key) {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch { return []; }
+    }
+    function save(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+    function norm(value) { return String(value || '').trim().toLowerCase(); }
+    function unique(values) {
+      const seen = new Set();
+      const result = [];
+      for (const value of values || []) {
+        const next = norm(value);
+        if (!next || seen.has(next)) continue;
+        seen.add(next);
+        result.push(next);
+      }
+      return result;
+    }
+    function coverage(have, need) {
+      const needed = unique(need);
+      if (!needed.length) return 1;
+      const owned = new Set(unique(have));
+      return needed.filter((item) => owned.has(item)).length / needed.length;
+    }
+    function splitList(value) { return String(value || '').split(',').map((part) => part.trim()).filter(Boolean); }
+    function scoreMatch(candidate, requirement) {
+      if (!requirement) {
+        const readiness = candidate.applicationReady ? 25 : 0;
+        return { score: 30 + readiness, factors: [{ label: 'Profile on file', points: 30 }, { label: 'Application readiness', points: readiness }] };
+      }
+      const role = norm(candidate.role);
+      const targetRole = norm(requirement.role);
+      let rolePoints = 0;
+      if (role && role === targetRole) rolePoints = 25;
+      else if (role && targetRole && (role.includes(targetRole) || targetRole.includes(role))) rolePoints = 10;
+      const factors = [
+        { label: 'Role alignment', points: rolePoints },
+        { label: 'Cuisine overlap', points: Math.round(20 * coverage(candidate.cuisine, requirement.cuisine)) },
+        { label: 'Location', points: norm(candidate.location) === norm(requirement.location) ? 15 : 0 },
+        { label: 'Experience', points: Math.max(0, 15 - Math.max(0, requirement.minExperience - candidate.experienceYears) * 5) },
+        { label: 'Skills', points: Math.round(15 * coverage(candidate.skills, requirement.requiredSkills)) },
+        { label: 'Application readiness', points: candidate.applicationReady ? 10 : 0 }
+      ];
+      return { score: Math.min(100, factors.reduce((sum, factor) => sum + factor.points, 0)), factors };
+    }
+    function applicationToCandidate(application) {
+      return {
+        id: 'application-' + application.id,
+        name: application.fullName.trim(),
+        role: application.role.trim(),
+        cuisine: application.cuisine,
+        location: application.location.trim(),
+        experienceYears: application.experienceYears,
+        phone: application.phone.trim() || undefined,
+        email: application.email.trim() || undefined,
+        source: 'application',
+        status: 'structured',
+        applicationReady: true,
+        summary: application.summary.trim() || (application.fullName.trim() + ' submitted an application for ' + application.role.trim() + '.'),
+        skills: application.skills,
+        availability: application.availability.trim() || undefined,
+        salaryExpectation: application.salaryExpectation.trim() || undefined,
+        applicationId: application.id
+      };
+    }
+    function sourceLabel(source) {
+      return { discovery: 'Potential · Discovery', referral: 'Potential · Referral', job_board: 'Potential · Job board', application: 'Application' }[source];
+    }
+    function profileLabel(candidate) {
+      const labels = { hired: 'Hired', trial: 'Trial', interview: 'Interview', contacted: 'Contacted', shortlisted: 'Shortlisted', invited: 'Invited to apply', structured: 'Application-ready' };
+      if (labels[candidate.status]) return labels[candidate.status];
+      return candidate.applicationReady ? 'Application-ready' : sourceLabel(candidate.source);
+    }
+    function activeRequirement() {
+      return state.requirements.find((job) => job.id === state.activeRequirementId) || state.requirements[0] || null;
+    }
+    function roster() {
+      const structured = state.applications.map(applicationToCandidate);
+      const replaced = new Set(state.applications.map((item) => item.sourceCandidateId).filter(Boolean));
+      const ids = new Set(structured.map((item) => item.id));
+      return [...structured, ...SEED.filter((chef) => !ids.has(chef.id) && !replaced.has(chef.id))].map((candidate) => ({
+        ...candidate,
+        status: state.pipeline[candidate.id] || candidate.status
+      }));
+    }
+    function matchesQuery(candidate, query) {
+      const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      if (!terms.length) return true;
+      const haystack = [candidate.name, candidate.role, candidate.location, candidate.summary, ...candidate.cuisine, ...candidate.skills].join(' ').toLowerCase();
+      return terms.every((term) => haystack.includes(term));
+    }
+    function visible() {
+      const role = document.getElementById('filter-role').value;
+      const cuisine = document.getElementById('filter-cuisine').value;
+      const location = document.getElementById('filter-location').value.trim().toLowerCase();
+      const readyOnly = document.getElementById('filter-ready').checked;
+      const requirement = activeRequirement();
+      return roster()
+        .filter((candidate) => matchesQuery(candidate, state.query))
+        .filter((candidate) => role === 'all' || candidate.role === role)
+        .filter((candidate) => cuisine === 'all' || candidate.cuisine.some((item) => item.toLowerCase() === cuisine.toLowerCase()))
+        .filter((candidate) => !location || candidate.location.toLowerCase().includes(location))
+        .filter((candidate) => !readyOnly || candidate.applicationReady)
+        .map((candidate) => ({ candidate, breakdown: scoreMatch(candidate, requirement) }))
+        .sort((a, b) => b.breakdown.score - a.breakdown.score);
+    }
+    function fillSelect(id, values, current) {
+      const select = document.getElementById(id);
+      const options = ['<option value="all">All ' + (id === 'filter-role' ? 'roles' : 'cuisines') + '</option>']
+        .concat([...new Set(values)].sort().map((value) => '<option value="' + esc(value) + '">' + esc(value) + '</option>'));
+      select.innerHTML = options.join('');
+      select.value = [...select.options].some((option) => option.value === current) ? current : 'all';
+    }
+    function render() {
+      const people = roster();
+      const requirement = activeRequirement();
+      const scored = people.map((candidate) => ({ candidate, breakdown: scoreMatch(candidate, requirement) }));
+      const pipelineItems = scored.filter((item) => PIPELINE.includes(item.candidate.status));
+      document.getElementById('stats').innerHTML = [
+        ['Discovery records', people.filter((item) => item.source !== 'application').length],
+        ['Application-ready talent', people.filter((item) => item.applicationReady).length],
+        ['Open requirements', state.requirements.length],
+        ['In pipeline', pipelineItems.length]
+      ].map(([label, value]) => '<article class="stat"><span>' + label + '</span><strong>' + value + '</strong></article>').join('');
+
+      const target = document.getElementById('active-target');
+      if (requirement) {
+        target.hidden = false;
+        target.textContent = 'Matching target: ' + requirement.role + ' at ' + requirement.restaurantName + ', ' + requirement.location;
+      } else target.hidden = true;
+
+      fillSelect('filter-role', people.map((item) => item.role), document.getElementById('filter-role').value);
+      fillSelect('filter-cuisine', people.flatMap((item) => item.cuisine), document.getElementById('filter-cuisine').value);
+
+      const status = document.getElementById('roster-status');
+      const list = document.getElementById('roster');
+      if (state.searching) {
+        status.innerHTML = '<div class="loading" role="status"><div class="loading-mark"></div><div><strong>Updating the roster</strong><ul><li>Filtering chefs already in the roster</li><li>Keeping discovery rows labelled as potential records</li><li>Scoring application readiness</li></ul></div></div>';
+        list.innerHTML = '';
+      } else {
+        const rows = visible();
+        status.innerHTML = rows.length ? '' : '<p class="empty">No candidates match this filter.</p>';
+        const caption = requirement ? 'Match' : 'Preview';
+        list.innerHTML = rows.map(({ candidate, breakdown }) => {
+          const inPipeline = PIPELINE.includes(candidate.status);
+          return '<article class="card"><header class="card-top"><div><p class="eyebrow">' + esc(profileLabel(candidate)) + '</p><h3>' + esc(candidate.name) + '</h3><p class="card-role">' + esc(candidate.role) + ' · ' + esc(candidate.location) + '</p></div><div class="score"><strong>' + breakdown.score + '</strong><span>' + caption + '</span></div></header><p class="summary">' + esc(candidate.summary) + '</p><ul class="chips">' + candidate.cuisine.map((item) => '<li>' + esc(item) + '</li>').join('') + '<li>' + candidate.experienceYears + ' yrs</li></ul><div class="card-actions"><button type="button" class="button" data-open="' + esc(candidate.id) + '">View profile</button><button type="button" class="button ghost" data-shortlist="' + esc(candidate.id) + '"' + (inPipeline ? ' disabled' : '') + '>' + (inPipeline ? 'In pipeline' : 'Shortlist') + '</button></div></article>';
+        }).join('');
+      }
+
+      document.getElementById('application-list').innerHTML = state.applications.length
+        ? state.applications.map((item) => '<li><strong>' + esc(item.fullName) + '</strong><span>' + esc(item.role) + ' · ' + esc(item.location) + '</span><span class="fine">' + esc(new Date(item.submittedAt).toLocaleString()) + '</span></li>').join('')
+        : '<li class="fine">No chef applications yet.</li>';
+      document.getElementById('requirement-list').innerHTML = state.requirements.length
+        ? state.requirements.map((item) => '<li><strong>' + esc(item.restaurantName) + '</strong><span>' + esc(item.role) + ' · ' + esc(item.location) + '</span><button type="button" class="' + (item.id === requirement?.id ? 'button' : 'button ghost') + '" data-target="' + esc(item.id) + '">' + (item.id === requirement?.id ? 'Matching target' : 'Use for matching') + '</button></li>').join('')
+        : '<li class="fine">No restaurant requirements yet.</li>';
+
+      const columns = { shortlisted: 'Shortlist', contacted: 'Contact', interview: 'Interview', trial: 'Trial', hired: 'Hire' };
+      document.getElementById('pipeline').innerHTML = PIPELINE.map((stage) => {
+        const cards = pipelineItems.filter((item) => item.candidate.status === stage);
+        const body = cards.length ? cards.map((item) => '<article class="column-card"><p class="eyebrow">' + esc(profileLabel(item.candidate)) + '</p><h3>' + esc(item.candidate.name) + '</h3><p>' + esc(item.candidate.role) + '</p><p class="fine">Score ' + item.breakdown.score + '</p><div class="card-actions"><button type="button" class="button ghost" data-open="' + esc(item.candidate.id) + '">Open</button>' + (stage === 'hired' ? '' : '<button type="button" class="button" data-advance="' + esc(item.candidate.id) + '">Advance</button>') + '</div></article>').join('') : '<p class="fine">No chefs in this stage.</p>';
+        return '<div class="column"><header><h2>' + columns[stage] + '</h2><span>' + cards.length + '</span></header>' + body + '</div>';
+      }).join('');
+
+      renderModal();
+    }
+    function renderModal() {
+      const modal = document.getElementById('modal');
+      const found = roster().find((candidate) => candidate.id === state.selectedId);
+      if (!found) { modal.hidden = true; modal.innerHTML = ''; return; }
+      const requirement = activeRequirement();
+      const breakdown = scoreMatch(found, requirement);
+      const inPipeline = PIPELINE.includes(found.status);
+      const advance = { shortlisted: 'Mark contacted', contacted: 'Move to interview', interview: 'Move to trial', trial: 'Mark hired' }[found.status];
+      modal.hidden = false;
+      modal.innerHTML = '<div class="dialog" role="dialog" aria-modal="true"><header class="dialog-head"><div><p class="eyebrow">' + esc(profileLabel(found)) + '</p><h2>' + esc(found.name) + '</h2><p>' + esc(found.role) + ' · ' + esc(found.location) + ' · ' + found.experienceYears + ' years</p></div><button type="button" class="icon-button" data-close="modal" aria-label="Close profile">×</button></header><p class="summary">' + esc(found.summary) + '</p><section><h3>Contact</h3><p>' + esc(found.phone || 'No phone on file') + '</p><p>' + esc(found.email || 'No email on file') + '</p><p class="fine">Phone numbers are stored as contact details.</p></section><section><h3>' + (requirement ? 'Match to ' + esc(requirement.restaurantName) : 'Preview score') + '</h3><p class="score-line">' + breakdown.score + '</p><ul class="factors">' + breakdown.factors.map((factor) => '<li><span>' + esc(factor.label) + '</span><strong>' + factor.points + '</strong></li>').join('') + '</ul></section><div class="dialog-actions">' + (found.applicationReady ? '' : '<button type="button" class="button" data-invite="' + esc(found.id) + '">Invite to apply</button>') + (inPipeline ? '' : '<button type="button" class="button ghost" data-shortlist="' + esc(found.id) + '">Add to shortlist</button>') + (advance ? '<button type="button" class="button" data-advance="' + esc(found.id) + '">' + advance + '</button>' : '') + '</div></div>';
+    }
+    function showView(view) {
+      state.view = view;
+      document.getElementById('view-discover').hidden = view !== 'discover';
+      document.getElementById('view-applications').hidden = view !== 'applications';
+      document.getElementById('view-pipeline').hidden = view !== 'pipeline';
+      document.querySelectorAll('[data-view]').forEach((button) => button.classList.toggle('active', button.dataset.view === view));
+    }
+    function setMessage(id, text) {
+      const node = document.getElementById(id);
+      node.hidden = !text;
+      node.textContent = text;
+    }
+    function shortlist(id) {
+      if (PIPELINE.includes(state.pipeline[id])) return;
+      state.pipeline[id] = 'shortlisted';
+      render();
+    }
+    function advance(id) {
+      const candidate = roster().find((item) => item.id === id);
+      const status = state.pipeline[id] || candidate?.status || 'potential';
+      const index = PIPELINE.indexOf(status);
+      state.pipeline[id] = index === -1 ? 'shortlisted' : PIPELINE[Math.min(PIPELINE.length - 1, index + 1)];
+      render();
+    }
+    function invite(id) {
+      const candidate = roster().find((item) => item.id === id);
+      if (!candidate) return;
+      if (!PIPELINE.includes(state.pipeline[id])) state.pipeline[id] = 'invited';
+      document.getElementById('chef-source').value = candidate.id;
+      document.getElementById('chef-name').value = candidate.name;
+      document.getElementById('chef-phone').value = candidate.phone || '';
+      document.getElementById('chef-email').value = candidate.email || '';
+      document.getElementById('chef-location').value = candidate.location;
+      document.getElementById('chef-role').value = candidate.role;
+      document.getElementById('chef-years').value = candidate.experienceYears;
+      document.getElementById('chef-cuisine').value = candidate.cuisine.join(', ');
+      document.getElementById('chef-skills').value = candidate.skills.join(', ');
+      state.selectedId = null;
+      setMessage('chef-error', '');
+      setMessage('chef-message', 'Invite started. Submit the application to create a structured candidate.');
+      showView('applications');
+      render();
+    }
+
+    document.getElementById('roster-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      state.query = document.getElementById('filter-query').value;
+      state.searching = true;
+      render();
+      window.setTimeout(() => { state.searching = false; render(); }, 500);
+    });
+    document.getElementById('chef-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const years = Number(document.getElementById('chef-years').value);
+      const name = document.getElementById('chef-name').value.trim();
+      const role = document.getElementById('chef-role').value.trim();
+      const location = document.getElementById('chef-location').value.trim();
+      if (!name || !role || !location || !Number.isFinite(years) || years < 0) {
+        setMessage('chef-error', 'Name, role, location, and years of experience are required.');
+        setMessage('chef-message', '');
+        return;
+      }
+      state.applications.unshift({
+        id: crypto.randomUUID(),
+        fullName: name,
+        phone: document.getElementById('chef-phone').value.trim(),
+        email: document.getElementById('chef-email').value.trim(),
+        location,
+        role,
+        cuisine: splitList(document.getElementById('chef-cuisine').value),
+        experienceYears: years,
+        skills: splitList(document.getElementById('chef-skills').value),
+        availability: document.getElementById('chef-availability').value.trim(),
+        salaryExpectation: document.getElementById('chef-salary').value.trim(),
+        summary: document.getElementById('chef-summary').value.trim(),
+        submittedAt: new Date().toISOString(),
+        sourceCandidateId: document.getElementById('chef-source').value || undefined
+      });
+      save(APPS_KEY, state.applications);
+      event.target.reset();
+      setMessage('chef-error', '');
+      setMessage('chef-message', 'Application saved. This chef is now a structured candidate.');
+      render();
+    });
+    document.getElementById('job-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const years = Number(document.getElementById('job-years').value);
+      const restaurant = document.getElementById('job-name').value.trim();
+      const role = document.getElementById('job-role').value.trim();
+      const location = document.getElementById('job-location').value.trim();
+      if (!restaurant || !role || !location || !Number.isFinite(years) || years < 0) {
+        setMessage('job-error', 'Restaurant, role, location, and minimum experience are required.');
+        setMessage('job-message', '');
+        return;
+      }
+      const requirement = {
+        id: crypto.randomUUID(),
+        restaurantName: restaurant,
+        contactName: document.getElementById('job-contact').value.trim(),
+        phone: document.getElementById('job-phone').value.trim(),
+        email: document.getElementById('job-email').value.trim(),
+        location,
+        role,
+        cuisine: splitList(document.getElementById('job-cuisine').value),
+        minExperience: years,
+        requiredSkills: splitList(document.getElementById('job-skills').value),
+        employmentType: document.getElementById('job-type').value,
+        salaryRange: document.getElementById('job-salary').value.trim(),
+        notes: document.getElementById('job-notes').value.trim(),
+        submittedAt: new Date().toISOString()
+      };
+      state.requirements.unshift(requirement);
+      state.activeRequirementId = requirement.id;
+      save(JOBS_KEY, state.requirements);
+      event.target.reset();
+      setMessage('job-error', '');
+      setMessage('job-message', 'Requirement saved and set as the matching target.');
+      render();
+    });
+    document.body.addEventListener('click', (event) => {
+      const view = event.target.closest('[data-view]');
+      if (view) { showView(view.dataset.view); return; }
+      if (event.target.id === 'open-settings') { document.getElementById('settings').hidden = false; return; }
+      const close = event.target.closest('[data-close]');
+      if (close) {
+        if (close.dataset.close === 'modal') state.selectedId = null;
+        document.getElementById(close.dataset.close).hidden = true;
+        if (close.dataset.close === 'modal') render();
+        return;
+      }
+      if (event.target.id === 'modal') { state.selectedId = null; render(); return; }
+      if (event.target.id === 'settings') { document.getElementById('settings').hidden = true; return; }
+      const open = event.target.closest('[data-open]');
+      if (open) { state.selectedId = open.dataset.open; render(); return; }
+      const short = event.target.closest('[data-shortlist]');
+      if (short) { shortlist(short.dataset.shortlist); return; }
+      const next = event.target.closest('[data-advance]');
+      if (next) { advance(next.dataset.advance); return; }
+      const invited = event.target.closest('[data-invite]');
+      if (invited) { invite(invited.dataset.invite); return; }
+      const target = event.target.closest('[data-target]');
+      if (target) { state.activeRequirementId = target.dataset.target; render(); }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      state.selectedId = null;
+      document.getElementById('settings').hidden = true;
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>

@@ -29,6 +29,14 @@ Shortlist → Contact → Interview → Trial → Hire
 3. Start the app: `npm run dev`. Discover loads ChefFinder Search, Programmable Search Engine `f5cf19bdcf6e04bc5`.
 4. Optional API: `npm run server` (proxied from Vite at `/api`)
 
+## View the site
+
+Open [`docs/index.html`](docs/index.html) in a browser. It is a single file with the V1 workflow: discovery roster, ChefFinder Search, chef applications, restaurant requirements, match scores, and the hiring pipeline.
+
+GitHub Pages serves that same file. After this branch is on `main`, set the repository Pages source to **GitHub Actions** (or to the `main` branch `/docs` folder). The site will be at:
+
+https://vikramakula-dev.github.io/ChefFinder_AI/
+
 ## Checks
 
 - `npm test` — scoring ignores phone numbers and any runtime verified flag
