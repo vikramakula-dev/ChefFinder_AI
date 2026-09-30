@@ -77,9 +77,12 @@ export default function App() {
   const roster = useMemo(() => {
     const structured = applications.map(applicationToCandidate);
     const structuredIds = new Set(structured.map((candidate) => candidate.id));
+    const replacedDiscoveryIds = new Set(
+      applications.flatMap((application) => application.sourceCandidateId ? [application.sourceCandidateId] : []),
+    );
     const merged = [
       ...structured,
-      ...seedChefs.filter((chef) => !structuredIds.has(chef.id)),
+      ...seedChefs.filter((chef) => !structuredIds.has(chef.id) && !replacedDiscoveryIds.has(chef.id)),
     ];
     return merged.map((candidate) => ({
       ...candidate,
@@ -154,6 +157,7 @@ export default function App() {
       cuisine: candidate.cuisine,
       experienceYears: candidate.experienceYears,
       skills: candidate.skills,
+      sourceCandidateId: candidate.id,
     });
     setDraftToken((token) => token + 1);
     setSelectedId(null);
@@ -232,10 +236,10 @@ export default function App() {
 
         {view === 'applications' && (
           <ApplicationsView
+            key={draftToken}
             applications={applications}
             requirements={requirements}
             draft={draft}
-            draftToken={draftToken}
             activeRequirementId={activeRequirement?.id ?? null}
             onSubmitApplication={submitApplication}
             onSubmitRequirement={submitRequirement}

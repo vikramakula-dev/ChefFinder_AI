@@ -30,7 +30,7 @@ With no restaurant requirement selected, the UI shows a preview score from profi
 
 ## Pipeline
 
-From a candidate profile, a recruiter can invite a potential chef to apply, shortlist them, then move the record through contact, interview, trial, and hire. An invite copies contact fields into the application form. Submitting that form is what creates the structured candidate.
+From a candidate profile, a recruiter can invite a potential chef to apply, shortlist them, then move the record through contact, interview, trial, and hire. An invite copies contact fields into the application form. Submitting that form creates the structured candidate and, when the invite came from a discovery record, replaces that discovery row.
 
 ## Storage
 

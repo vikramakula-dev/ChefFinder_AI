@@ -1,11 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import type { ChefApplication, JobRequirement } from '../types';
 
 interface ApplicationsViewProps {
   applications: ChefApplication[];
   requirements: JobRequirement[];
   draft: Partial<ChefApplication> | null;
-  draftToken: number;
   activeRequirementId: string | null;
   onSubmitApplication: (application: ChefApplication) => void;
   onSubmitRequirement: (requirement: JobRequirement) => void;
@@ -24,6 +23,7 @@ interface ChefFormState {
   availability: string;
   salaryExpectation: string;
   summary: string;
+  sourceCandidateId: string;
 }
 
 interface JobFormState {
@@ -53,6 +53,7 @@ const EMPTY_CHEF: ChefFormState = {
   availability: '',
   salaryExpectation: '',
   summary: '',
+  sourceCandidateId: '',
 };
 
 const EMPTY_JOB: JobFormState = {
@@ -80,40 +81,39 @@ function formatWhen(iso: string): string {
   return date.toLocaleString();
 }
 
+function chefFormFromDraft(draft: Partial<ChefApplication> | null): ChefFormState {
+  return {
+    ...EMPTY_CHEF,
+    fullName: draft?.fullName ?? '',
+    phone: draft?.phone ?? '',
+    email: draft?.email ?? '',
+    location: draft?.location ?? '',
+    role: draft?.role ?? '',
+    cuisineText: (draft?.cuisine ?? []).join(', '),
+    experienceYears: draft?.experienceYears !== undefined ? String(draft.experienceYears) : '',
+    skillsText: (draft?.skills ?? []).join(', '),
+    summary: draft?.summary ?? '',
+    sourceCandidateId: draft?.sourceCandidateId ?? '',
+  };
+}
+
 export function ApplicationsView({
   applications,
   requirements,
   draft,
-  draftToken,
   activeRequirementId,
   onSubmitApplication,
   onSubmitRequirement,
   onSelectRequirement,
 }: ApplicationsViewProps) {
-  const [chef, setChef] = useState<ChefFormState>(EMPTY_CHEF);
+  const [chef, setChef] = useState<ChefFormState>(() => chefFormFromDraft(draft));
   const [job, setJob] = useState<JobFormState>(EMPTY_JOB);
   const [chefError, setChefError] = useState('');
   const [jobError, setJobError] = useState('');
-  const [chefMessage, setChefMessage] = useState('');
+  const [chefMessage, setChefMessage] = useState(() => (
+    draft?.fullName ? 'Invite started. Submit the application to create a structured candidate.' : ''
+  ));
   const [jobMessage, setJobMessage] = useState('');
-
-  useEffect(() => {
-    if (!draft) return;
-    setChef({
-      ...EMPTY_CHEF,
-      fullName: draft.fullName ?? '',
-      phone: draft.phone ?? '',
-      email: draft.email ?? '',
-      location: draft.location ?? '',
-      role: draft.role ?? '',
-      cuisineText: (draft.cuisine ?? []).join(', '),
-      experienceYears: draft.experienceYears !== undefined ? String(draft.experienceYears) : '',
-      skillsText: (draft.skills ?? []).join(', '),
-      summary: draft.summary ?? '',
-    });
-    setChefError('');
-    setChefMessage('Invite started. Submit the application to create a structured candidate.');
-  }, [draft, draftToken]);
 
   function submitChef(event: FormEvent) {
     event.preventDefault();
@@ -138,6 +138,7 @@ export function ApplicationsView({
       salaryExpectation: chef.salaryExpectation.trim(),
       summary: chef.summary.trim(),
       submittedAt: new Date().toISOString(),
+      sourceCandidateId: chef.sourceCandidateId || undefined,
     });
     setChef(EMPTY_CHEF);
     setChefError('');

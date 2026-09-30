@@ -50,6 +50,8 @@ export interface ChefApplication {
   salaryExpectation: string;
   summary: string;
   submittedAt: string;
+  /** Discovery record this application replaces, when the chef was invited from one. */
+  sourceCandidateId?: string;
 }
 
 /** Structured matching target created when a restaurant submits a requirement. */
