@@ -1,0 +1,6 @@
+{
+  "name": "ChefFinder AI",
+  "description": "AI-powered recruitment dashboard for Indian restaurants, bakeries, cafés, cloud kitchens, and hotels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
